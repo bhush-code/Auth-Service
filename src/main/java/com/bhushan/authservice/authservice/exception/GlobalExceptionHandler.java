@@ -51,23 +51,6 @@ public class GlobalExceptionHandler {
         return buildResponse(exception,HttpStatus.FORBIDDEN,request);
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorResponse> handleJwtExpiredException(ExpiredJwtException exception,HttpServletRequest request)
-    {
-        return buildResponse(exception,HttpStatus.BAD_REQUEST,request);
-    }
-
-    @ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<ErrorResponse> handleJwtMalformedException(MalformedJwtException exception,HttpServletRequest request)
-    {
-        return buildResponse(exception,HttpStatus.BAD_REQUEST,request);
-    }
-    
-    @ExceptionHandler(JwtException.class)
-    public ResponseEntity<ErrorResponse> handleGenericJwtException(JwtException exception,HttpServletRequest request)
-    {
-        return buildResponse(exception,HttpStatus.BAD_REQUEST,request);
-    }
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exception,HttpServletRequest request)
