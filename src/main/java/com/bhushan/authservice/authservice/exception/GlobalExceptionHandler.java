@@ -1,5 +1,9 @@
 package com.bhushan.authservice.authservice.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import jakarta.persistence.ExcludeDefaultListeners;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.hibernate.exception.AuthException;
@@ -9,6 +13,7 @@ import  com.bhushan.authservice.authservice.dto.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 
 @RestControllerAdvice
@@ -39,6 +44,20 @@ public class GlobalExceptionHandler {
     {
         return buildResponse(exception,exception.getStatus(),request);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException exception, HttpServletRequest request)
+    {
+        return buildResponse(exception,HttpStatus.FORBIDDEN,request);
+    }
+
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception exception,HttpServletRequest request)
+    {
+        return buildResponse(exception,HttpStatus.INTERNAL_SERVER_ERROR,request);
+    }
+    
 
 
     private ResponseEntity<ErrorResponse> buildResponse(Exception ex, HttpStatus status, HttpServletRequest request)

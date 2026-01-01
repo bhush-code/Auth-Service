@@ -1,5 +1,7 @@
 package com.bhushan.authservice.authservice.dto;
 
+import java.io.Serializable;
+
 public record UserResponseDto(
         String userId,
         String firstName,
@@ -7,4 +9,4 @@ public record UserResponseDto(
         String email,
         String mobileNumber,
         String createdAt
-) {}
+) implements Serializable {}
