@@ -13,6 +13,7 @@ import com.bhushan.authservice.authservice.repo.UserProfileRepo;
 import com.bhushan.authservice.authservice.repo.UserRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,7 @@ public class UserService {
     }
 
 
+    @Cacheable(value ="User", key="#userId")
     public UserResponseDto getUser(UUID userId)
     {
         Optional<User> user=userRepo.findById(userId);
