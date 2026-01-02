@@ -1,9 +1,5 @@
 package com.bhushan.authservice.authservice.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import jakarta.persistence.ExcludeDefaultListeners;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.hibernate.exception.AuthException;
