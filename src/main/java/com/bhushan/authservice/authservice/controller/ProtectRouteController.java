@@ -28,4 +28,13 @@ public class ProtectRouteController {
     {
         return new ResponseEntity<>(userService.getUser(userId), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/user")
+    public ResponseEntity<String> getUser()
+    {
+        return new ResponseEntity<>("Protected Route", HttpStatus.OK);
+    }
+
+
 }
