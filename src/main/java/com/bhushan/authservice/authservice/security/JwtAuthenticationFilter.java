@@ -1,5 +1,6 @@
 package com.bhushan.authservice.authservice.security;
 
+import com.bhushan.authservice.authservice.entity.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +28,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -40,7 +43,7 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
    protected boolean shouldNotFilter(HttpServletRequest request)
    {
         String path=request.getServletPath();
-        return path.startsWith("/user/v1/") || path.startsWith("/auth/v1/login");
+        return path.startsWith("/user/v1/") || path.startsWith("/auth/v1/login") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs");
    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -53,24 +56,19 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
               throw new AuthenticationException("Authorization header is missing or invalid"){};
 
-//              filterChain.doFilter(request,response);
-//              return;
           }
 
           String token=authHeader.substring(7);
-          String email=jwtService.extractUsername(token);
-
-          if(email!=null && SecurityContextHolder.getContext().getAuthentication()==null)
-          {
-              UserDetails user=userDetailsService.loadUserByUsername(email);
-
-              if(jwtService.isTookenValid(token,user))
-              {
-                  UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
-                  SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-              }
-
+          if (!jwtService.isTokenValid(token)) {
+              sendError(response, "Invalid JWT token", HttpStatus.UNAUTHORIZED);
+              return;
           }
+
+
+          String email=jwtService.extractUsername(token);
+          List<String> roles= jwtService.extractRoles(token);
+          UsernamePasswordAuthenticationToken authenticationToken=new UsernamePasswordAuthenticationToken(email,null,roles.stream().map(SimpleGrantedAuthority::new).toList());
+          SecurityContextHolder.getContext().setAuthentication(authenticationToken);
           filterChain.doFilter(request,response);
       }catch(ExpiredJwtException exception)
       {

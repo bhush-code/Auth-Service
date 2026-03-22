@@ -1,6 +1,7 @@
 package com.bhushan.authservice.authservice.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,9 +61,16 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean isTookenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secret)
+                    .build()
+                    .parseClaimsJws(token); // ✔ signature + expiry check
+            return true;
+        } catch (JwtException | IllegalArgumentException ex) {
+            return false;
+        }
     }
 
 
@@ -73,5 +81,11 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("sub",String.class);
+    }
+
+    public List<String> extractRoles(String token) {
+
+        Claims claim=extractAllClaims(token);
+        return claim.get("roles", List.class);
     }
 }
