@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AppAuthProvider {
 
 
-    private final UserDetailsService userDetailsService;
+        private final UserDetailsService userDetailsService;
 
     @Autowired
     public AppAuthProvider(UserDetailsService userDetailsService) {

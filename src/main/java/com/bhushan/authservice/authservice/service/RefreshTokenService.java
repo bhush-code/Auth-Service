@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,9 @@ public class RefreshTokenService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     private static final Logger log = LoggerFactory.getLogger(RefreshTokenService.class);
 
@@ -102,6 +106,10 @@ public class RefreshTokenService {
 
         RefreshToken rt=refreshTokenRepository.findByUserUserId(user.get().getUserId());
 
+        if (rt == null) {
+            throw new CustomRefreshTokenException("Refresh token not found for user", HttpStatus.NOT_FOUND);
+        }
+
         if(!passwordEncoder.matches(rawToken,rt.getToken()))
         {
             throw new CustomRefreshTokenException("Invalid Refresh token",HttpStatus.BAD_REQUEST);
@@ -113,7 +121,27 @@ public class RefreshTokenService {
 
         }
 
-        UserDetails currentAuthUser= (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Safely obtain UserDetails: prefer SecurityContext principal when available; otherwise fall back to username from expired JWT
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = (authentication == null) ? null : authentication.getPrincipal();
+        UserDetails currentAuthUser;
+        if (principal instanceof UserDetails) {
+            currentAuthUser = (UserDetails) principal;
+        } else if (principal instanceof String) {
+            // principal is username string
+            currentAuthUser = userDetailsService.loadUserByUsername((String) principal);
+            if (currentAuthUser == null) {
+                throw new CustomUserException("Authenticated user not found", HttpStatus.NOT_FOUND);
+            }
+        } else if (principal == null) {
+            // No authentication in context (common when access token is expired) - load by username extracted from expired JWT
+            currentAuthUser = userDetailsService.loadUserByUsername(userIdFromExpiredJwt);
+            if (currentAuthUser == null) {
+                throw new CustomUserException("Authenticated user not found", HttpStatus.NOT_FOUND);
+            }
+        } else {
+            throw new CustomRefreshTokenException("Unsupported authentication principal type: " + (principal == null ? "null" : principal.getClass().getName()), HttpStatus.UNAUTHORIZED);
+        }
 
         String newAccessToken= jwtService.generateToken(currentAuthUser);
 
