@@ -3,6 +3,7 @@ package com.bhushan.authservice.authservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString(exclude = "userProfile")
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
     @Id
     private UUID userId;
 
