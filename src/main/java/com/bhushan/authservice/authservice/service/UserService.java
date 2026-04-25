@@ -81,6 +81,7 @@ public class UserService {
     {
         logger.debug("Fetching user from database for userId: {}", userId);
         Optional<User> user = userRepo.findByIdWithProfile(userId);
+        Optional<User> user = userRepo.findById(userId);
         if(user.isEmpty())
         {
             throw new CustomUserException("User not exists", HttpStatus.NOT_FOUND);
@@ -110,6 +111,7 @@ public class UserService {
         // Fallback to database
         logger.info("Falling back to database for user lookup with userId: {}", userId);
         Optional<User> user = userRepo.findByIdWithProfile(userId);
+        Optional<User> user = userRepo.findById(userId);
         if(user.isEmpty())
         {
             throw new CustomUserException("User not exists", HttpStatus.NOT_FOUND);
@@ -141,6 +143,8 @@ public class UserService {
         logger.debug("Fetching all users from database with optimized query");
         List<User> users = userRepo.findAllWithProfiles();
         logger.info("Retrieved {} users from database", users.size());
+        logger.debug("Fetching all users from database");
+        List<User> users = userRepo.findAll();
         return userMapper.toUserDtoList(users);
     }
 }
