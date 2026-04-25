@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     {
         try {
             logger.debug("Loading user details for email: {}", email);
-            User user = userLookupService.getUserByEmailWithFallback(email);
+            User user = userLookupService.getUserByEmail(email);
             Set<String> roles = user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet());
             logger.debug("Successfully loaded user details for email: {}", email);
             return new CustomUser(user.getEmail(), user.getPassword(), roles);
