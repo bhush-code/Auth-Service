@@ -431,7 +431,7 @@ server.port=9091
 # Database
 spring.datasource.url=jdbc:postgresql://localhost:5432/authdb
 spring.datasource.username=postgres
-spring.datasource.password=9604
+spring.datasource.password=<password>
 spring.jpa.hibernate.ddl-auto=update
 
 # Redis
@@ -441,7 +441,7 @@ spring.data.redis.host=localhost
 spring.data.redis.port=6379
 
 # JWT
-jwt.secret=7cc5de2df70752a311cec5c82f3edc67c35671a33da9b7c63db6a5c7109317fb
+jwt.secret=<secret>
 security.refresh.expiry-days=15
 
 # Logging
