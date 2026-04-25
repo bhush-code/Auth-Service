@@ -1,6 +1,6 @@
-# 🔐 ToDo AuthService
+# 🔐AuthService
 
-**Authentication and Authorization Microservice for ToDo Application**
+**Authentication and Authorization Microservice **
 
 ![Build Status](https://img.shields.io/badge/build-success-brightgreen)
 ![Java Version](https://img.shields.io/badge/Java-21-blue)
